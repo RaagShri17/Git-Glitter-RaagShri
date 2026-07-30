@@ -41,3 +41,45 @@ def analyse_topic_performance(quiz_results: list) -> dict:
         reason = f"Low average score ({avg_score:.0f}%)"
 
     return {"is_weak": True, "reason": reason, "severity": severity}
+
+
+# ==========================================================
+# CONFIDENCE MATRIX — new feature
+#
+# Compares what a student BELIEVES about a topic (confidence, 1-5,
+# self-reported) against what quiz results say is TRUE (score_pct).
+# Places the topic into one of 4 quadrants. "danger_zone" is the
+# headline case: student feels sure, but the data disagrees — the
+# exact pattern that blindsides people on real exams.
+#
+# This does not replace analyse_topic_performance() above — it's an
+# additional, independent signal computed from the same quiz data.
+# ==========================================================
+
+def confidence_matrix_position(confidence: int, score_pct: float) -> dict:
+    """
+    confidence: 1-5 (student's self-rating, from TopicOut.confidence)
+    score_pct: 0-100 (actual quiz performance, from QuizSubmission.score_pct)
+    """
+    expected_score = confidence * 20  # scale 1-5 -> 20-100
+    gap = round(expected_score - score_pct, 1)
+    feels_confident = confidence >= 4
+    actually_strong = score_pct >= 65
+
+    if feels_confident and not actually_strong:
+        quadrant = "danger_zone"
+        message = (
+            "You feel sure about this — but your scores say otherwise. "
+            "This is exactly the kind of topic that blindsides people on exam day."
+        )
+    elif not feels_confident and actually_strong:
+        quadrant = "hidden_strength"
+        message = "You're doing better here than you think. Trust yourself more on this one."
+    elif feels_confident and actually_strong:
+        quadrant = "well_calibrated"
+        message = "Your confidence matches your performance — good self-awareness here."
+    else:
+        quadrant = "correctly_flagged"
+        message = "You know this needs work, and the data agrees. Keep it in rotation."
+
+    return {"quadrant": quadrant, "gap": gap, "message": message}
