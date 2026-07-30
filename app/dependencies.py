@@ -1,14 +1,3 @@
-"""
-Auth dependency — placeholder for Person 2's auth system.
-
-INTEGRATION NOTE FOR PERSON 2 (Database & Auth):
-Right now this issues/validates plain JWTs against the in-memory user store,
-so the whole API is usable end-to-end today. When you wire up Firebase
-Authentication, replace `get_current_user` so it verifies the Firebase ID
-token instead (firebase_admin.auth.verify_id_token), then look up/create the
-matching user record. Keep the return type the same (a `user` dict with at
-least an "id" field) so nothing in routers/ or services/ has to change.
-"""
 from datetime import datetime, timedelta
 from typing import Optional
 
