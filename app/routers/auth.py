@@ -31,3 +31,9 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 @router.get("/me", response_model=UserOut)
 def me(current_user: dict = Depends(get_current_user)):
     return UserOut(id=current_user["id"], email=current_user["email"], name=current_user["name"])
+
+
+
+@router.get("/me", response_model=UserOut)
+def me(current_user: dict = Depends(get_current_user)):
+    return UserOut(id=current_user["id"], email=current_user["email"], name=current_user["name"])
