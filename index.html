@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Studiora — The AI Study Agent That Thinks With You</title>
+<meta name="description" content="Studiora is an AI study agent: daily check-ins, adaptive syllabus planning, weak zone radar, forgetting-curve revision and mock tests." />
+<meta property="og:title" content="Studiora — AI Study Agent" />
+<meta property="og:description" content="Adaptive study plans, weak zone radar, forgetting curve tracking and Flora AI coaching." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">S</span><div><strong>Studiora</strong><small>by Git&amp;Glitter</small></div></div>
+    <nav id="nav">
+      <button class="nav-item active" data-view="dashboard"><span>◎</span> Dashboard</button>
+      <button class="nav-item" data-view="checkin"><span>☀</span> Daily Check-in</button>
+      <button class="nav-item" data-view="planner"><span>▤</span> Syllabus Planner</button>
+      <button class="nav-item" data-view="weak"><span>◈</span> Weak Zone Radar</button>
+      <button class="nav-item" data-view="retention"><span>∿</span> Forgetting Curve</button>
+      <button class="nav-item" data-view="triage"><span>⚑</span> Exam Triage</button>
+      <button class="nav-item" data-view="mock"><span>✎</span> Mock Tests</button>
+      <button class="nav-item" data-view="flora"><span>❋</span> Flora AI</button>
+      <button class="nav-item" data-view="peers"><span>⚭</span> Peer Benchmark</button>
+    </nav>
+    <div class="side-foot">
+      <div class="streak-chip"><b id="streakDays">0</b> day streak 🔥</div>
+      <button class="ghost sm" id="resetBtn">Reset demo data</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><h1 id="viewTitle">Dashboard</h1><p id="viewSub" class="sub">Your adaptive study cockpit.</p></div>
+      <div class="topbar-actions">
+        <div class="focus-pill">Focus today <b id="focusPct">—</b></div>
+        <button class="primary" id="quickCheckin">Start check-in</button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="grid grid-4">
+        <div class="card stat"><small>Topics mastered</small><b id="sMastered">0</b><span class="trend" id="sMasteredOf"></span></div>
+        <div class="card stat"><small>Study hours (7d)</small><b id="sHours">0</b><span class="trend">target 21h</span></div>
+        <div class="card stat"><small>Retention score</small><b id="sRetention">0%</b><span class="trend">memory health</span></div>
+        <div class="card stat"><small>Next exam in</small><b id="sExam">—</b><span class="trend" id="sExamName"></span></div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-head"><h3>Today's adaptive plan</h3><span class="tag" id="planMode">balanced</span></div>
+          <ul class="plan-list" id="todayPlan"></ul>
+          <div class="progressbar"><i id="planProgress"></i></div>
+          <p class="hint" id="planHint">Complete blocks to let Studiora rebalance tomorrow.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Weekly effort</h3><span class="tag">hours / day</span></div>
+          <div class="bars" id="weekBars"></div>
+          <div class="card-head" style="margin-top:22px"><h3>Subject balance</h3></div>
+          <div class="stackbar" id="subjectBalance"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHECK-IN -->
+    <section class="view" id="view-checkin">
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>How are you today?</h3>
+          <p class="hint">Studiora reshapes your plan from these four signals.</p>
+          <label class="field">Energy level <b id="lblEnergy">6</b>/10
+            <input type="range" id="energy" min="1" max="10" value="6" />
+          </label>
+          <label class="field">Focus level <b id="lblFocus">7</b>/10
+            <input type="range" id="focus" min="1" max="10" value="7" />
+          </label>
+          <label class="field">Available hours <b id="lblHours">3</b>h
+            <input type="range" id="hours" min="1" max="12" value="3" />
+          </label>
+          <label class="field">Mood
+            <div class="chips" id="moodChips">
+              <button class="chip active" data-mood="calm">😌 Calm</button>
+              <button class="chip" data-mood="motivated">🔥 Motivated</button>
+              <button class="chip" data-mood="tired">😴 Tired</button>
+              <button class="chip" data-mood="anxious">😰 Anxious</button>
+            </div>
+          </label>
+          <button class="primary wide" id="generatePlan">Generate today's plan</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>AI reasoning</h3><span class="tag" id="capacityTag">capacity —</span></div>
+          <div id="aiReason" class="reason">Move the sliders and generate a plan to see how Studiora thinks.</div>
+          <ul class="plan-list" id="checkinPlan"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLANNER -->
+    <section class="view" id="view-planner">
+      <div class="card">
+        <div class="card-head"><h3>Syllabus intake</h3><span class="tag">PDF / text</span></div>
+        <div class="dropzone" id="dropzone">
+          <p><b>Drop your syllabus PDF here</b></p>
+          <p class="hint">or paste topics below — one per line, format: <code>Subject: Topic</code></p>
+          <input type="file" id="fileInput" accept=".pdf,.txt" hidden />
+          <button class="ghost" id="browseBtn">Browse file</button>
+        </div>
+        <textarea id="syllabusText" rows="5" placeholder="Physics: Rotational Motion&#10;Chemistry: Electrochemistry&#10;Maths: Definite Integrals"></textarea>
+        <button class="primary" id="extractBtn">Extract topics &amp; build schedule</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Generated schedule</h3><span class="tag" id="topicCount">0 topics</span></div>
+        <div class="table" id="scheduleTable"></div>
+      </div>
+    </section>
+
+    <!-- WEAK ZONES -->
+    <section class="view" id="view-weak">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-head"><h3>Weak zone radar</h3><span class="tag">accuracy by concept</span></div>
+          <canvas id="radar" width="440" height="440"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Mistake patterns</h3></div>
+          <ul class="pattern-list" id="patternList"></ul>
+          <div class="card-head" style="margin-top:18px"><h3>Recommended fixes</h3></div>
+          <ul class="plan-list" id="fixList"></ul>
+        </div>
+      </div>
+<div class="card">
+  <div class="card-head">
+    <h3>Confidence Matrix</h3>
+    <span class="tag">belief vs. reality</span>
+  </div>
+  <p class="hint">Topics where what you feel and what the data says don't match.</p>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <div>
+      <div class="card-head" style="margin-bottom:8px">
+        <h3 style="font-size:13px;color:var(--rose)">🚨 Danger Zone</h3>
+      </div>
+      <ul class="plan-list" id="matrixDanger"></ul>
+    </div>
+    <div>
+      <div class="card-head" style="margin-bottom:8px">
+        <h3 style="font-size:13px;color:var(--sky)">💡 Hidden Strength</h3>
+      </div>
+      <ul class="plan-list" id="matrixHidden"></ul>
+    </div>
+  </div>
+</div>
+    </section>
+
+    <!-- RETENTION -->
+    <section class="view" id="view-retention">
+      <div class="card">
+        <div class="card-head"><h3>Forgetting curve</h3><span class="tag">predicted recall over 14 days</span></div>
+        <canvas id="curve" width="900" height="320"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Revision queue</h3><span class="tag" id="revCount">0 due</span></div>
+        <div class="table" id="revisionTable"></div>
+      </div>
+    </section>
+
+    <!-- TRIAGE -->
+    <section class="view" id="view-triage">
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Add an exam</h3>
+          <label class="field">Subject <input type="text" id="exSubject" placeholder="Physics" /></label>
+          <label class="field">Days away <input type="number" id="exDays" value="7" min="1" max="180" /></label>
+          <label class="field">Weight / marks <input type="number" id="exWeight" value="100" min="10" max="500" /></label>
+          <label class="field">Your readiness <b id="lblReady">50</b>%<input type="range" id="exReady" min="0" max="100" value="50" /></label>
+          <button class="primary wide" id="addExam">Add to triage</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Triage priority</h3><span class="tag">urgency × impact</span></div>
+          <ul class="triage-list" id="triageList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOCK -->
+    <section class="view" id="view-mock">
+      <div class="card">
+        <div class="card-head"><h3>Mock test generator</h3><span class="tag">from your topics</span></div>
+        <div class="row">
+          <select id="mockSubject"></select>
+          <select id="mockCount"><option>5</option><option>8</option><option>10</option></select>
+          <button class="primary" id="genMock">Generate test</button>
+        </div>
+      </div>
+      <div class="card" id="mockCard" hidden>
+        <div id="quiz"></div>
+        <button class="primary" id="submitQuiz">Submit answers</button>
+        <div id="quizResult" class="reason" hidden></div>
+      </div>
+    </section>
+
+    <!-- FLORA -->
+    <section class="view" id="view-flora">
+      <div class="card chat-card">
+        <div class="card-head"><h3>Flora — your study coach</h3><span class="tag">always on</span></div>
+        <div class="chat" id="chat"></div>
+        <div class="chat-suggestions" id="suggestions">
+          <button class="chip">Explain entropy simply</button>
+          <button class="chip">I feel burnt out</button>
+          <button class="chip">Plan my next 3 hours</button>
+          <button class="chip">Quiz me on integrals</button>
+        </div>
+        <form class="chat-input" id="chatForm">
+          <input id="chatText" placeholder="Ask Flora anything…" autocomplete="off" />
+          <button class="primary" type="submit">Send</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PEERS -->
+    <section class="view" id="view-peers">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-head"><h3>Anonymous peer benchmark</h3><span class="tag">1,284 learners</span></div>
+          <div class="bench" id="benchList"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Consistency percentile</h3></div>
+          <div class="dial"><canvas id="dial" width="260" height="260"></canvas></div>
+          <p class="hint" id="benchNote"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
